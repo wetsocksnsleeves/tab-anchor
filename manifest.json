@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Anchor",
+  "version": "1.0",
+
+  "description": "Pinned tabs have their URLs locked by default, meaning you cannot navigate elsewhere whilst in the tab",
+
+  "icons": {
+    "48": "icons/tab-anchor-48.png"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tab-anchor@wetsocksnsleeves",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+
+  "permissions": ["tabs", "storage"],
+
+  "background": {
+    "scripts": ["background.js"]
+  }
+}
