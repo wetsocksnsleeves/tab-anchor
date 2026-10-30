@@ -48,3 +48,9 @@ fieldset {
   padding: 0px;
   margin: 0px;
 }
+
+.disable-label {
+  font-color: red;
+  text-align: center;
+  italic: true;
+}
