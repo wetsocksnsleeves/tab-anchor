@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <script src="popup.js"></script>
+    <h3>Tab Anchor</h3>
+    <div class="tab-options">
+      <div class="option">
+        <input type="radio" id="strict" name="strict" value="1"/>
+        <div>
+          <label class="label" for="strict">Strict</label>
+          <p>URL stays anchored</p>
+        </div>
+      </div>
+
+      <div class="option">
+        <input type="radio" id="loose" name="loose" value="2"/>
+        <div>
+          <label class="label" for="loose">Loose</label>
+          <p>Can navigate within domain</p>
+        </div>
+      </div>
+
+      <div class="option">
+        <input type="radio" id="free" name="free" value="3"/>
+        <div>
+          <label class="label" for="free">Free</label>
+          <p>Doesn't have any anchoring, just a normal pinned tab</p>
+        </div>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="option">
+      <div>
+        <label class="label" for="default-selector">Default</label>
+        <p>Define the default behaviour for a pinned tab</p>
+      </div>
+
+      <select>
+        <option value="strict">Strict</option>
+        <option value="loose">Loose</option>
+        <option value="free">Free</option>
+      </select>
+    </div>
+
+  </body>
+  <footer class="footer">made by <a href="https://etaotsai.dev" target="_blank" rel="noopener noreferrer">wetsocksnsleeves</a></footer>
+</html>

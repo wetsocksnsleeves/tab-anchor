@@ -1,0 +1,44 @@
+html, body {
+  margin: 0px;
+  user-select: none;
+}
+
+body {
+  margin: 15px;
+  width: 220px;          /* fixed width; or min-width if content can grow */
+  max-height: 600px;     /* match Firefox's cap */
+  overflow-y: auto;      /* scroll long lists instead of clipping */
+  font: 14px system-ui, sans-serif;
+}
+
+.label {
+  margin-bottom: 0px;
+}
+
+.label + p {
+  margin-top: 0px;
+  font-size: 10px;
+  font-color: grey;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.footer {
+  padding-top: 20px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.footer a:visited {
+  color: blue;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: #d3d3d3;
+}
