@@ -7,9 +7,9 @@
   <body>
     <script src="popup.js"></script>
     <h3>Tab Anchor</h3>
-    <div class="tab-options">
+    <fieldset class="tab-options" id="tab-option">
       <div class="option">
-        <input type="radio" id="strict" name="strict" value="1"/>
+        <input type="radio" id="strict" name="tab-options" value="strict"/>
         <div>
           <label class="label" for="strict">Strict</label>
           <p>URL stays anchored</p>
@@ -17,7 +17,7 @@
       </div>
 
       <div class="option">
-        <input type="radio" id="loose" name="loose" value="2"/>
+        <input type="radio" id="loose" name="tab-options" value="loose"/>
         <div>
           <label class="label" for="loose">Loose</label>
           <p>Can navigate within domain</p>
@@ -25,13 +25,13 @@
       </div>
 
       <div class="option">
-        <input type="radio" id="free" name="free" value="3"/>
+        <input type="radio" id="free" name="tab-options" value="free"/>
         <div>
           <label class="label" for="free">Free</label>
           <p>Doesn't have any anchoring, just a normal pinned tab</p>
         </div>
       </div>
-    </div>
+    </fieldset>
 
     <hr/>
 
