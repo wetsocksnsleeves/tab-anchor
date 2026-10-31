@@ -16,7 +16,9 @@ The above scenario is something that I've done alot of times, so I wrote Tab Anc
 It stores and tracks each pinned tab you have. A pinned tab can have 3 modes.
 
 Strict - You cannot navigate away from that specific url
+
 Loose - You can navigate around within that domain
+
 Free - You can do whatever. Default pinned tab behaviour
 
 You can select a default mode, or override the mode per pinned tab. It's all tracked
