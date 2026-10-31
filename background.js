@@ -1,10 +1,21 @@
+import { SETTINGS_KEY } from "./constants.js";
+
 // Adds a tab to storage
 async function storePinnedTab(tabId) {
     const tab = await browser.tabs.get(tabId);
-    const storedData = {title: tab.title, url: tab.url}
+    const storedData = {title: tab.title, url: tab.url, mode: "none"};
 
     await browser.storage.local.set({[String(tabId)]: storedData});
     console.log(storedData);
+}
+
+async function setDefaultConfig() {
+    const key = SETTINGS_KEY;
+    const {[key] : data} = await browser.storage.local.get(key);
+
+    if (!data) {
+        await browser.storage.local.set({[key]: {default: 'strict'}});
+    }
 }
 
 // Grabs a id, check in storage, remove if it's there
@@ -22,7 +33,7 @@ async function storeAllPinnedTabs() {
     const pinnedTabs = await browser.tabs.query({ pinned: true })
     for (const tab of pinnedTabs) {
         await storePinnedTab(tab.id);
-  }
+    }
 }
 
 async function updatePinnedTab(tabId) {
@@ -46,10 +57,13 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
 });
 
 // Remove from storage if it's there
-browser.tabs.onRemoved.addListener(
-    removeClosedPinnedTab
-);
+browser.tabs.onRemoved.addListener(removeClosedPinnedTab);
+
+async function initialise() {
+    await storeAllPinnedTabs();
+    await setDefaultConfig();
+}
 
 // On install, reload, and startup
-browser.runtime.onInstalled.addListener(storeAllPinnedTabs());
-browser.runTime.onStartup.addListener(storeAllPinnedTabs());
+browser.runtime.onInstalled.addListener(initialise);
+browser.runTime.onStartup.addListener(initialise);
