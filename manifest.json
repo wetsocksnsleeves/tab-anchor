@@ -6,8 +6,10 @@
   "description": "Pinned tabs have their URLs locked by default, meaning you cannot navigate elsewhere whilst in the tab",
 
   "icons": {
-    "48": "icons/tab-anchor-48.png"
-  },
+  "48": "icons/tab-anchor-48.png",
+  "96": "icons/tab-anchor-96.png",
+  "128": "icons/tab-anchor-128.png"
+},
 
   "browser_specific_settings": {
     "gecko": {
@@ -20,7 +22,11 @@
 
   "action": {
     "default_area": "navbar",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+        "16": "icons/tab-anchor-16.png",
+        "32": "icons/tab-anchor-32.png"
+    }
   },
 
   "permissions": ["tabs", "storage"],
