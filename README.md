@@ -1,5 +1,7 @@
 ![Coded by](https://img.shields.io/badge/Coded%20by-human-blue?style=for-the-badge)
 
+<img src="icons/tab-anchor-128.png" alt="Tab Anchor icon" width="96">
+
 # Tab Anchor
 
 A browser extension which solves the problem that everyone faces (hopefully).
