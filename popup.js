@@ -78,7 +78,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         changeDefault(e.target.value);
         syncPanelConfig();
     });
-
-    
 });
 
