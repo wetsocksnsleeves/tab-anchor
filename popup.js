@@ -20,6 +20,14 @@ async function changeDefault(value) {
     document.getElementById("default-selector").value = value;
 }
 
+async function changeOpenInNewTab(enabled) {
+    const [key, settings] = await getSettings();
+
+    if (!settings) return;
+
+    await writeStorageRow(key, {...settings, openInNewTab: enabled});
+}
+
 async function syncPanelConfig() {
     const tab = await getTab();
 
@@ -34,6 +42,7 @@ async function syncPanelConfig() {
     if (settings) {
         document.getElementById(settings.default).checked = true;
         document.getElementById('default-selector').value = settings.default;
+        document.getElementById('open-in-new-tab').checked = Boolean(settings.openInNewTab);
     }
 
     const [tabId, tabData]= await getTabRow(tab.id);
@@ -64,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const defaultSelector = document.getElementById('default-selector');
     const tabOptions = document.getElementById("tab-option");
+    const openInNewTab = document.getElementById('open-in-new-tab');
 
     tabOptions.addEventListener('change', (e) => {
         setCurrentMode(e.target.value);
@@ -72,5 +82,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     defaultSelector.addEventListener('change', async (e) => {
         await changeDefault(e.target.value);
         await syncPanelConfig();
+    });
+
+    openInNewTab.addEventListener('change', (e) => {
+        changeOpenInNewTab(e.target.checked);
     });
 });

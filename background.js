@@ -14,7 +14,7 @@ async function storePinnedTab(tabId) {
 
 // Sets default extension configuration
 async function setDefaultConfig() {
-    const defaultConfig = {default: "strict"};
+    const defaultConfig = {default: "strict", openInNewTab: false};
 
     if (!(await getSettings())) {
         console.log("No settings, initialising defaults");
@@ -67,18 +67,30 @@ async function guardPinnedTab(tabId, url) {
     // If not on the same host, don't allow
     if (mode === "loose" && !sameHost(tabData.url, url)) {
         console.log("Navigation not allowed.");
-        await navigateToStoredUrl(tabId, tabData.url);
+        await blockNavigation(tabId, tabData.url, url, settings);
         return;
     };
 
     // Don't allow anything
     if (mode === "strict" && tabData.url !== url) {
         console.log("Navigation not allowed.");
-        await navigateToStoredUrl(tabId, tabData.url);
+        await blockNavigation(tabId, tabData.url, url, settings);
         return;
     }
 
     await storePinnedTab(tabId);
+}
+
+async function blockNavigation(tabId, storedUrl, url, settings) {
+    if (settings?.openInNewTab) {
+        try {
+            await browser.tabs.create({ url, openerTabId: tabId });
+        } catch (error) {
+            console.log("Could not open navigation in a new tab", error);
+        }
+    }
+
+    await navigateToStoredUrl(tabId, storedUrl);
 }
 
 async function navigateToStoredUrl(tabId, storedUrl) {
