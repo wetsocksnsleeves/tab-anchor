@@ -1,5 +1,5 @@
 import { SETTINGS_KEY } from "./constants.js";
-import {getStorageRow, writeStorageRow} from "./utils.js";
+import {getStorageRow, writeStorageRow, getTabRow, writeTabRow} from "./utils.js";
 
 async function getTab() {
     const [tab] = await browser.tabs.query({active: true, currentWindow: true});
@@ -7,9 +7,7 @@ async function getTab() {
 }
 
 async function getSettings() {
-    const [key, settings] = await getStorageRow(SETTINGS_KEY);
-
-    if(settings !== undefined) return [key, settings];
+    return await getStorageRow(SETTINGS_KEY);
 }
 
 async function changeDefault(value) {
@@ -19,8 +17,8 @@ async function changeDefault(value) {
 
     const data = {...settings, default: value};
     await writeStorageRow(key, data);
-    document.getElementById("default-selector").value = settings?.default;
-} 
+    document.getElementById("default-selector").value = value;
+}
 
 async function syncPanelConfig() {
     const tab = await getTab();
@@ -34,11 +32,11 @@ async function syncPanelConfig() {
     const [_, settings] = await getSettings();
 
     if (settings) {
-        document.getElementById(settings?.default).checked = true;
+        document.getElementById(settings.default).checked = true;
+        document.getElementById('default-selector').value = settings.default;
     }
-    document.getElementById('default-selector').value = settings?.default;
 
-    const [tabId, tabData]= await getStorageRow(tab.id);
+    const [tabId, tabData]= await getTabRow(tab.id);
 
     if (tabData?.mode !== "none") {
         await setCurrentMode();
@@ -47,18 +45,18 @@ async function syncPanelConfig() {
 
 async function setCurrentMode(value) {
     const tab = await getTab();
-    const [tabId, tabData] = await getStorageRow(tab.id);
+    const [tabId, tabData] = await getTabRow(tab.id);
 
     if (!tabData) return;
 
     if (value) {
         console.log("update tab: ", tabId, "'s mode to: ", value);
-        await browser.storage.local.set({ [tabId] : {...tabData, mode: value}})
+        await writeTabRow(tabId, {...tabData, mode: value});
         document.getElementById(value).checked = true;
         return;
     }
 
-    document.getElementById(tabData?.mode).checked = true;
+    document.getElementById(tabData.mode).checked = true;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -71,9 +69,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setCurrentMode(e.target.value);
     });
 
-    defaultSelector.addEventListener('change', (e) => {
-        changeDefault(e.target.value);
-        syncPanelConfig();
+    defaultSelector.addEventListener('change', async (e) => {
+        await changeDefault(e.target.value);
+        await syncPanelConfig();
     });
 });
-

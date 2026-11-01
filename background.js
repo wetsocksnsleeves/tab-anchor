@@ -1,14 +1,14 @@
 import { SETTINGS_KEY, MODES } from "./constants.js";
-import { getStorageRow, getTab, writeStorageRow, sameHost } from "./utils.js";
+import { getStorageRow, getTab, writeStorageRow, getTabRow, writeTabRow, removeTabRow, sameHost } from "./utils.js";
 
 // Writes a tab to storage, verbatim or updates existing one
 async function storePinnedTab(tabId) {
-    const [_, tabData] = await getStorageRow(tabId);
+    const [_, tabData] = await getTabRow(tabId);
 
     const tab = await getTab(tabId);
     const storedData = {title: tab.title, url: tab.url, mode: tabData?.mode ?? "none"};
 
-    await browser.storage.local.set({[String(tabId)]: storedData});
+    await writeTabRow(tabId, storedData);
     console.log(storedData);
 }
 
@@ -30,12 +30,21 @@ async function getSettings() {
 
 // Grabs a id, check in storage, remove if it's there
 async function removeClosedPinnedTab(tabId) {
-    const [key, tabData] = await getStorageRow(tabId);
+    const [key, tabData] = await getTabRow(tabId);
 
     if (!tabData) return;
     console.log("Pinned tab closed", key);
 
-    await browser.storage.local.remove(key);
+    await removeTabRow(tabId);
+}
+
+async function removeLegacyTabRows() {
+    const rows = await browser.storage.local.get(null);
+    const legacyKeys = Object.keys(rows).filter((key) => key !== SETTINGS_KEY);
+
+    if (legacyKeys.length > 0) {
+        await browser.storage.local.remove(legacyKeys);
+    }
 }
 
 async function storeAllPinnedTabs() {
@@ -46,26 +55,26 @@ async function storeAllPinnedTabs() {
 }
 
 async function guardPinnedTab(tabId, url) {
-    const [key, tabData] = await getStorageRow(tabId);
+    const [key, tabData] = await getTabRow(tabId);
     if (!tabData) return;
 
-    const defaultMode = await getSettings();
+    const settings = await getSettings();
 
-    const mode = tabData?.mode === "none" ? defaultMode.default : tabData?.mode;
+    const mode = tabData.mode === "none" ? settings?.default : tabData.mode;
 
     if (!MODES.includes(mode)) return;
 
     // If not on the same host, don't allow
-    if (mode === "loose" && !sameHost(tabData?.url, url)) {
+    if (mode === "loose" && !sameHost(tabData.url, url)) {
         console.log("Navigation not allowed.");
-        await navigateToStoredUrl(tabId, tabData?.url);
+        await navigateToStoredUrl(tabId, tabData.url);
         return;
     };
 
     // Don't allow anything
-    if (mode === "strict" && tabData?.url !== url) {
+    if (mode === "strict" && tabData.url !== url) {
         console.log("Navigation not allowed.");
-        await navigateToStoredUrl(tabId, tabData?.url);
+        await navigateToStoredUrl(tabId, tabData.url);
         return;
     }
 
@@ -80,10 +89,11 @@ async function navigateToStoredUrl(tabId, storedUrl) {
 browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
     // Storage operations
     if ("pinned" in changeInfo) {
-      if (changeInfo.pinned === false) {
-        removeClosedPinnedTab(tabId);
-      }
-        storePinnedTab(tabId);
+        if (changeInfo.pinned) {
+            storePinnedTab(tabId);
+        } else {
+            removeClosedPinnedTab(tabId);
+        }
     }
 
     // Navigation guard
@@ -101,5 +111,8 @@ async function initialise() {
 }
 
 // On install, reload, and startup
-browser.runtime.onInstalled.addListener(initialise);
+browser.runtime.onInstalled.addListener(async () => {
+    await removeLegacyTabRows();
+    await initialise();
+});
 browser.runtime.onStartup.addListener(initialise);
