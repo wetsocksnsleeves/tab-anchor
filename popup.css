@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "Open Sans";
+  src: url("fonts/open-sans-latin-wght-normal.woff2") format("woff2");
+  font-weight: 300 800;
+  font-style: normal;
+}
+
 html, body {
   margin: 0px;
   user-select: none;
@@ -8,7 +15,11 @@ body {
   width: 220px;          /* fixed width; or min-width if content can grow */
   max-height: 600px;     /* match Firefox's cap */
   overflow-y: auto;      /* scroll long lists instead of clipping */
-  font: 14px system-ui, sans-serif;
+  font: 14px "Open Sans", system-ui, sans-serif;
+}
+
+select, input {
+  font: inherit;
 }
 
 .label {
@@ -31,10 +42,12 @@ body {
   padding-top: 20px;
   text-align: center;
   font-size: 11px;
+  font-weight: 700;
 }
 
-.footer a:visited {
-  color: blue;
+.footer a {
+  color: #00563F;
+  text-decoration: none;
 }
 
 hr {
