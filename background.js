@@ -1,6 +1,8 @@
 import { SETTINGS_KEY, MODES } from "./constants.js";
 import { getStorageRow, getTab, writeStorageRow, getTabRow, writeTabRow, removeTabRow, sameHost } from "./utils.js";
 
+const restoringTabs = new Set();
+
 // Writes a tab to storage, verbatim or updates existing one
 async function storePinnedTab(tabId) {
     const [_, tabData] = await getTabRow(tabId);
@@ -30,6 +32,7 @@ async function getSettings() {
 
 // Grabs a id, check in storage, remove if it's there
 async function removeClosedPinnedTab(tabId) {
+    restoringTabs.delete(tabId);
     const [key, tabData] = await getTabRow(tabId);
 
     if (!tabData) return;
@@ -82,6 +85,16 @@ async function guardPinnedTab(tabId, url) {
 }
 
 async function blockNavigation(tabId, storedUrl, url, settings) {
+    if (restoringTabs.has(tabId)) return;
+    restoringTabs.add(tabId);
+
+    try {
+        await navigateToStoredUrl(tabId, storedUrl);
+    } catch (error) {
+        restoringTabs.delete(tabId);
+        throw error;
+    }
+
     if (settings?.openInNewTab) {
         try {
             await browser.tabs.create({ url, openerTabId: tabId });
@@ -89,8 +102,6 @@ async function blockNavigation(tabId, storedUrl, url, settings) {
             console.log("Could not open navigation in a new tab", error);
         }
     }
-
-    await navigateToStoredUrl(tabId, storedUrl);
 }
 
 async function navigateToStoredUrl(tabId, storedUrl) {
@@ -106,6 +117,10 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
         } else {
             removeClosedPinnedTab(tabId);
         }
+    }
+
+    if (changeInfo.status === "complete") {
+        restoringTabs.delete(tabId);
     }
 
     // Navigation guard
